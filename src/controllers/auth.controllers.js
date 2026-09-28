@@ -3,6 +3,7 @@ import { User } from '../models/user.models.js';
 import {apiError} from '../utils/apiError.js';
 import mongoose from 'mongoose';
 import { apiResponse } from '../utils/apiResponse.js';
+import { Blacklist } from '../models/blacklist.models.js';
 
 
 const generateAccessAndRefreshToken= async(userId)=>{
@@ -60,6 +61,78 @@ const registerUser= asyncHandler(async(req,res)=>{
     .json(new apiResponse(201,"User registered successfully"))
 })
 
+const loginUser = asyncHandler(async(req,res)=>{
+
+    const {email,password} = req.body
+
+    if(!email || !password){
+        throw new apiError(400,"email and password are required")
+    }
+
+    const user = await User.findOne({
+        email
+    })
+
+    if(!user){
+        throw new apiError(404,"User does not exist")
+    }
+
+    const isPasswordValid= await user.isPasswordCorrect(password)
+
+    if(!isPasswordValid){
+       throw new apiError(400,"Invalid password")
+    }
+
+    const {accessToken,refreshToken}= await generateAccessAndRefreshToken(user._id)
+
+    const loggedInuser= await User.findById(user._id).select(
+        "-password -refreshToken")
+
+    const options={
+        httpOnly:true,
+        secure:true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(new apiResponse(200,{
+        user:loggedInuser
+    },"logged In Successfully"))
+})
+
+const logoutUser= asyncHandler(async(req,res)=>{
+
+    const token= req.user?.refreshToken
+
+    if(token){
+        await Blacklist.create({token})
+    }
+
+    await User.findByIdAndUpdate(req.user?._id,
+        {
+            $unset:{
+                refreshToken:1
+            }
+        },
+        {new : true}
+    )
+
+    const options= {
+        httpOnly:true,
+        secure:true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(new apiResponse(200,{},"User logged out successfully"))
+})
+
 export {
-    registerUser
+    registerUser,
+    loginUser,
+    logoutUser
 }
