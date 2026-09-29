@@ -3,7 +3,7 @@ import { User } from '../models/user.models.js';
 import {apiError} from '../utils/apiError.js';
 import mongoose from 'mongoose';
 import { apiResponse } from '../utils/apiResponse.js';
-import { Blacklist } from '../models/blacklist.models.js';
+
 
 
 const generateAccessAndRefreshToken= async(userId)=>{
@@ -103,12 +103,6 @@ const loginUser = asyncHandler(async(req,res)=>{
 })
 
 const logoutUser= asyncHandler(async(req,res)=>{
-
-    const token= req.user?.refreshToken
-
-    if(token){
-        await Blacklist.create({token})
-    }
 
     await User.findByIdAndUpdate(req.user?._id,
         {
