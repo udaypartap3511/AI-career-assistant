@@ -66,7 +66,9 @@ const registerUser= asyncHandler(async(req,res)=>{
     .status(201)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
-    .json(new apiResponse(201,"User registered successfully"))
+    .json(new apiResponse(201,
+        {user:createdUser},
+    "User registered successfully"))
 })
 
 const loginUser = asyncHandler(async(req,res)=>{
