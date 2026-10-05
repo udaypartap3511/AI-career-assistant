@@ -16,7 +16,5 @@ export default function Protected({children}){
         return <Navigate to={"/login"}/>
     }
 
-    return(
-        children
-    )
+    return children
 }

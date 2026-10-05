@@ -10,7 +10,7 @@ const api=axios.create(
 export async function register({username,email,password}){
     
     try {
-        const response= api.post('/api/v1/auth/register',
+        const response= await api.post('/api/v1/auth/register',
             {
                 username,email,password
             },
@@ -19,7 +19,7 @@ export async function register({username,email,password}){
             // }
         )
 
-        return response.data
+        return response.data.data
     } catch (error) {
         
         console.log(error)
@@ -37,7 +37,7 @@ export async function login({email,password}){
             
         )
 
-        return response.data
+        return response.data.data
 
     } catch (error) {
         console.log(error)
@@ -51,7 +51,7 @@ export async function logout(){
         const response= await api.post("/api/v1/auth/logout",
         )
 
-        return response.data
+        return response.data.data
 
     } catch (error) {
         console.log(error)
@@ -61,10 +61,10 @@ export async function logout(){
 export async function getCurrentUser(){
 
     try {
-        const response= await api.get("/api/auth/getCurrentUser",
+        const response= await api.get("/api/v1/auth/getCurrentUser",
         )
 
-        return response.data;
+        return response.data.data;
     } catch (error) {
         console.log(error)
     }
