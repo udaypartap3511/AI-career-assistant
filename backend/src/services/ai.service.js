@@ -133,8 +133,9 @@ export async function generateInterviewReport({resume,selfDescription,jobDescrip
                 throw new Error("Received empty response from Gemini API");
             }
     
-    
-        console.log(interviewReportSchema.parse(JSON.parse(interaction.output_text)));
+        const result=interviewReportSchema.parse(JSON.parse(interaction.output_text))
+        console.log(result);
+        return result;
     } catch (error) {
         console.error("AI Service Error:", error.message || error);
         throw new Error("Failed to generate interview report due to a network or API error.")

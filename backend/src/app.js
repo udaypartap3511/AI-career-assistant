@@ -15,9 +15,10 @@ app.use(cors({
 
 // import routes
 import authRouter from './routes/auth.routes.js'
+import interviewRouter from "./routes/interview.routes.js"
 
 // using all the routes
 app.use("/api/v1/auth",authRouter)
-
+app.use("/api/v1/interview",interviewRouter)
 
 export {app}    
