@@ -14,9 +14,6 @@ export async function register({username,email,password}){
             {
                 username,email,password
             },
-            // {
-            //     withCredentials:true
-            // }
         )
 
         return response.data.data

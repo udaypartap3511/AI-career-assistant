@@ -99,10 +99,14 @@ const interviewReportJSONSchema= {
                 required: ["day","focus","tasks"]
             },
             description:"Preparation plan for the candidate to follow in order to prepare for the interview effectively"
+        },
+        title:{
+            type:"string",
+            description:"The title of the job for which the interview job is generated"
         }
     },
 
-    required: ["matchScore", "technicalQuestions", "behavioralQuestions", "skillGaps", "preparationPlans"]
+    required: ["matchScore", "technicalQuestions", "behavioralQuestions", "skillGaps", "preparationPlans","title"]
 }
 
 const interviewReportSchema= z.fromJSONSchema(interviewReportJSONSchema)
