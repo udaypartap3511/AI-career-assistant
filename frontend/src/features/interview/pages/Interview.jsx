@@ -1,62 +1,6 @@
 import React, { useState } from "react";
+import { useInterview } from "../hooks/useInterview";
 
-const sampleInterviewData = {
-  _id: "6ac69a71dc25b99994ef060c",
-  matchScore: 88,
-  technicalQuestions: [
-    {
-      question: "Explain the Node.js event loop and how it handles asynchronous I/O operations.",
-      intention: "To assess understanding of asynchronous execution in JavaScript runtime.",
-      answer:
-        "The event loop coordinates timers, I/O callbacks, and microtasks while Node handles concurrency efficiently. A candidate should explain how libuv delegates blocking tasks to the OS and how callbacks are queued back into the event loop for execution."
-    },
-    {
-      question: "How do you optimize a MongoDB aggregation pipeline for high-volume data?",
-      intention: "To evaluate database performance tuning knowledge.",
-      answer:
-        "Use $match early, project only required fields, add indexes, and avoid expensive operations before filtering. A strong answer also mentions limiting documents before $lookup and using $group only after narrowing the dataset."
-    },
-    {
-      question: "Can you describe the Cache-Aside pattern and when you would use Redis in a Node.js application?",
-      intention: "To check understanding of caching strategies and trade-offs.",
-      answer:
-        "Cache reads on a miss and write-through or invalidation on updates. Redis is helpful for sessions, rate limiting, leaderboard data, and storing hot query results that need low latency."
-    },
-    {
-      question: "What are the challenges of migrating a monolithic application to a modular service-based architecture?",
-      intention: "To assess system design awareness and migration planning.",
-      answer:
-        "Common challenges include data ownership boundaries, deployment complexity, inter-service communication, and maintaining consistent APIs. The candidate should also talk about phased migration, observability, and data consistency trade-offs."
-    }
-  ],
-  behavioralQuestions: [
-    {
-      question: "Tell me about a time you solved a difficult bug in a team project.",
-      intention: "To assess debugging process and collaboration.",
-      answer:
-        "Describe the actual issue, the approach used to isolate root cause, and the end result. Good candidates use STAR and explain how they tested and communicated fixes with the team."
-    }
-  ],
-  skillGaps: [
-    { skill: "Message Queue (RabbitMQ)", severity: "high" },
-    { skill: "Advanced Docker & CI/CD", severity: "medium" },
-    { skill: "Distributed Systems Design", severity: "medium" },
-    { skill: "Production-level Redis management", severity: "low" }
-  ],
-  preparationPlans: [
-    {
-      day: 1,
-      focus: "Advanced JavaScript & React Fundamentals",
-      tasks: ["Review closures and async patterns."]
-    }
-  ]
-};
-
-const navMeta = [
-  { key: "technical", label: "Technical Questions", count: "4 questions" },
-  { key: "behavioral", label: "Behavioral Questions", count: "1 question" },
-  { key: "roadmap", label: "Road Map", count: null }
-];
 
 const severityClasses = {
   high: "border-[#ff5a7a]/35 bg-[#ff2d56]/10 text-[#ff90a8]",
@@ -76,13 +20,38 @@ function SectionIcon({ active = false }) {
   );
 }
 
-export default function Interview({ data = sampleInterviewData }) {
-  const report = data ?? sampleInterviewData;
+export default function Interview() {
+  const {report,getReportById} = useInterview()
   const [activeTab, setActiveTab] = useState("technical");
   const [expandedIndexes, setExpandedIndexes] = useState([0]);
 
+
+  
+
+   if (!report) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#050d18] text-white">
+        <div className="text-center">
+          <h1 className="text-xl font-semibold">
+            No interview report found
+          </h1>
+          <p className="mt-2 text-slate-400">
+            Please generate an interview report first.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   const technicalQuestions = report.technicalQuestions ?? [];
   const behavioralQuestions = report.behavioralQuestions ?? [];
+
+  const navMeta = [
+  { key: "technical", label: "Technical Questions", count: `${technicalQuestions.length} questions` },
+  { key: "behavioral", label: "Behavioral Questions", count: `${behavioralQuestions.length} questions` },
+  { key: "roadmap", label: "Road Map", count: null }
+];
+
   const skillGaps = report.skillGaps ?? [];
   const matchScore = Number(report.matchScore ?? 0);
   const radius = 42;
@@ -90,6 +59,8 @@ export default function Interview({ data = sampleInterviewData }) {
   const dashOffset = circumference - (matchScore / 100) * circumference;
 
   const activeQuestions = activeTab === "technical" ? technicalQuestions : behavioralQuestions;
+
+  
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050d18] px-4 py-4 text-slate-100 md:px-5">

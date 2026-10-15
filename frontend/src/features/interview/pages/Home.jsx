@@ -1,3 +1,7 @@
+import React,{useState,useRef} from "react";
+import { useInterview } from "../hooks/useInterview.js";
+import { useNavigate } from "react-router";
+
 function UploadIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-7 w-7">
@@ -17,6 +21,30 @@ function PlusIcon() {
 }
 
 export default function Home() {
+
+  const {loading,generateReport,reports}= useInterview()
+  const [jobDescription,setJobDescription] = useState("")
+  const [selfDescription,setSelfDescription] = useState("")
+  const [resumeFile,setResumeFile]= useState(null)
+  const resumeInputRef = useRef()
+
+  const navigate = useNavigate()
+
+  const handleGenerateReport = async () =>{
+    const resumeFile = resumeInputRef.current.files[0]
+    const data = await generateReport({jobDescription,selfDescription,resumeFile})
+    navigate(`/interview/${data._id}`)
+  }
+
+  if(loading){
+    return(
+      <main>
+        <h1>Loading your interview plan....</h1>
+      </main>
+    )
+  }
+
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050c18] px-4 py-8 text-slate-100 md:px-8">
       <div className="pointer-events-none absolute inset-0 opacity-60" style={{
@@ -53,6 +81,7 @@ export default function Home() {
              </div>
 
              <textarea
+               onChange={(e)=>{setJobDescription(e.target.value)}}
                aria-label="Target Job Description"
                placeholder={'Paste the full job description here... e.g. "Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design..."'}
                className="h-[360px] w-full resize-none rounded-[14px] border border-[#1e2e3c] bg-[#0f1f2f] px-4 py-3 text-[15px] leading-7 text-slate-200 placeholder:text-slate-500 focus:outline-none"
@@ -80,12 +109,28 @@ export default function Home() {
                  </div>
 
                  <label className="flex h-[142px] cursor-pointer flex-col items-center justify-center rounded-[14px] border border-dashed border-[#2d435d] bg-[#0d1d2d] text-center text-slate-400 transition hover:border-[#ff5bb5] hover:text-[#ff8fd9]">
-                   <input type="file" accept=".pdf" className="hidden" />
-                   <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#ff2d56]/15 text-[#ff4b89]">
+                   <input ref={resumeInputRef} type="file" accept=".pdf" className="hidden" onChange={(e) => setResumeFile(e.target.files?.[0] || null)}/>
+                   {resumeFile ? (
+                    <>
+                      <span className="mb-3 text-2xl text-emerald-400">✓</span>
+
+                      <span className="max-w-full truncate px-4 text-sm font-medium text-emerald-400">
+                        {resumeFile.name}
+                      </span>
+
+                      <span className="mt-2 text-xs text-slate-400">
+                         Resume uploaded successfully
+                      </span>
+                    </>
+                   ):(
+                    <>
+                      <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#ff2d56]/15 text-[#ff4b89]">
                      <UploadIcon />
                    </span>
                    <span className="text-base font-medium text-slate-200">Click to upload or drag &amp; drop</span>
                    <span className="mt-2 text-sm text-slate-400">PDF or DOCX (Max 3MB)</span>
+                    </>
+                   )}
                  </label>
                </div>
 
@@ -98,6 +143,7 @@ export default function Home() {
                <div className="rounded-[14px] border border-[#23354a] bg-[#0d1d2d] p-4">
                  <p className="mb-3 text-lg font-semibold text-slate-100">Quick Self-Description</p>
                  <textarea
+                   onChange={(e)=>{setSelfDescription(e.target.value)}}
                    aria-label="Quick Self Description"
                    placeholder="Briefly describe your experience, key skills, and years of experience if you don't have a resume handy..."
                    className="h-[130px] w-full resize-none rounded-[12px] border border-[#1d2d3b] bg-[#101d2c] px-3 py-3 text-[15px] text-slate-200 placeholder:text-slate-500 focus:outline-none"
@@ -114,7 +160,7 @@ export default function Home() {
 
          <div className="mt-6 flex flex-col items-center justify-between gap-4 text-slate-300 md:flex-row">
            <p className="text-sm text-slate-400">AI-Powered Strategy Generation <span className="text-slate-500">•</span> Approx 30s</p>
-           <button className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#ff4d8d] to-[#ef2a5a] px-7 py-4 text-base font-bold text-white shadow-[0_10px_30px_rgba(255,52,122,0.45)] transition hover:brightness-110">
+           <button onClick={handleGenerateReport} className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#ff4d8d] to-[#ef2a5a] px-7 py-4 text-base font-bold text-white shadow-[0_10px_30px_rgba(255,52,122,0.45)] transition hover:brightness-110">
              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10">
                <PlusIcon />
              </span>
@@ -122,6 +168,58 @@ export default function Home() {
            </button>
          </div>
        </div>
+
+       
+
+{reports.length > 0 && (
+  <section className="mt-8">
+    <h2 className="mb-5 text-2xl font-bold text-white">
+      My Recent Interview Plans
+    </h2>
+
+    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {reports.map((report) => (
+        <li
+          key={report._id}
+          onClick={() => navigate(`/interview/${report._id}`)}
+          className="cursor-pointer rounded-xl border border-slate-700 bg-[#0d1a2a] p-5 transition hover:border-pink-500"
+        >
+          <h3 className="text-lg font-semibold text-white">
+            {report.title || "Untitled Position"}
+          </h3>
+
+          <p className="mt-2 text-sm text-slate-400">
+            Generated on{" "}
+            {new Date(report.createdAt).toLocaleDateString()}
+          </p>
+
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-sm text-slate-400">
+              Match Score
+            </span>
+
+            <span className="font-semibold text-emerald-400">
+              {report.matchScore ?? 0}%
+            </span>
+          </div>
+
+          <div className="mt-2 h-1.5 rounded-full bg-slate-700">
+            <div
+              className="h-1.5 rounded-full bg-emerald-400"
+              style={{
+                width: `${Math.min(
+                  100,
+                  Math.max(0, Number(report.matchScore) || 0)
+                )}%`,
+              }}
+            />
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
 
        <footer className="mt-8 flex justify-center gap-5 text-xs text-slate-400 md:gap-8">
          <a href="#" className="transition hover:text-slate-200">Privacy Policy</a>
