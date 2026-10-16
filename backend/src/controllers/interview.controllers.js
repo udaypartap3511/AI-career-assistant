@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {PDFParse} from "pdf-parse"
-import { generateInterviewReport } from "../services/ai.service.js";
+import { generateInterviewReport,generateResumePdf } from "../services/ai.service.js";
 import { InterviewReport } from "../models/interviewReport.models.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -79,5 +79,27 @@ const getAllInterviewReportsController= asyncHandler(async(req,res)=>{
     .json(new apiResponse(200,interviewReports,"Interview reports fetched successfully"))
 })
 
+const generateResumePdfController = asyncHandler(async(req,res)=>{
 
-export {generateInterviewReportController,getInterviewReportByIdController,getAllInterviewReportsController}
+    const {interviewReportId} = req.params
+
+    const interviewReport = await InterviewReport.findById(interviewReportId)
+
+    if(!interviewReport){
+        throw new apiError(404,"Inteview report not found")
+    }
+
+    const {resume, jobDescription, selfDescription} =interviewReport
+
+    const pdfBuffer= await generateResumePdf({resume,jobDescription,selfDescription})
+
+    res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
+    })
+
+    res.send(pdfBuffer)
+})
+
+
+export {generateInterviewReportController,getInterviewReportByIdController,getAllInterviewReportsController,generateResumePdfController}

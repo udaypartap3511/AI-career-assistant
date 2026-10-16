@@ -68,6 +68,8 @@ const preparationPlanSchema= new mongoose.Schema({
             required:[true,"task is required"]
         }
     ]
+},{
+    _id:false
 })
 
 const interviewReportSchema= new mongoose.Schema({
