@@ -22,7 +22,7 @@ function PlusIcon() {
 
 export default function Home() {
 
-  const {loading,generateReport,reports}= useInterview()
+  const {generateReport,reports}= useInterview()
   const [jobDescription,setJobDescription] = useState("")
   const [selfDescription,setSelfDescription] = useState("")
   const [resumeFile,setResumeFile]= useState(null)
@@ -36,13 +36,6 @@ export default function Home() {
     navigate(`/interview/${data._id}`)
   }
 
-  if(loading){
-    return(
-      <main>
-        <h1>Loading your interview plan....</h1>
-      </main>
-    )
-  }
 
 
   return (

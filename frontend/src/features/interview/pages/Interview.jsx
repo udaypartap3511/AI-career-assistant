@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useInterview } from "../hooks/useInterview";
+import { useParams } from "react-router";
 
 
 const severityClasses = {
@@ -21,12 +22,19 @@ function SectionIcon({ active = false }) {
 }
 
 export default function Interview() {
-  const {report,getReportById} = useInterview()
+  const {report,getReportById,loading,getResumePdf} = useInterview()
   const [activeTab, setActiveTab] = useState("technical");
   const [expandedIndexes, setExpandedIndexes] = useState([0]);
+  const {interviewId} = useParams()
 
 
-  
+  if(loading){
+    return(
+      <main>
+        <h1>Loading your interview plan....</h1>
+      </main>
+    )
+  }
 
    if (!report) {
     return (
@@ -74,7 +82,7 @@ export default function Interview() {
       />
 
       <div className="relative mx-auto flex h-[calc(100vh-32px)] w-full max-w-[1280px] overflow-hidden rounded-[18px] border border-[#233548] bg-[#071421]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_20px_60px_rgba(0,0,0,0.7)]">
-        <aside className="w-[220px] shrink-0 border-r border-[#1b2e43] bg-[#091a2a] px-4 py-5">
+        <aside className="flex h-full flex-col w-[220px] shrink-0 border-r border-[#1b2e43] bg-[#091a2a] px-4 py-5">
           <div className="mb-4 px-1 text-[11px] font-semibold tracking-[0.28em] text-slate-500">SECTIONS</div>
 
           <nav className="space-y-2">
@@ -105,6 +113,42 @@ export default function Interview() {
               );
             })}
           </nav>
+
+          
+          <button
+          type="button"
+          className="mt-auto group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-[#ff5eac] px-5 py-3 font-semibold text-white shadow-lg shadow-pink-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-500/30 active:translate-y-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#071321]"
+          onClick={()=>{getResumePdf(interviewId)}}
+          >
+          <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12"
+          aria-hidden="true"
+          >
+          <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+          </svg>
+
+          <span>Download Resume</span>
+
+          <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5"
+          aria-hidden="true"
+          >
+         <path
+         d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"
+         strokeLinecap="round"
+         strokeLinejoin="round"
+        />
+        </svg>
+        </button>
+
         </aside>
 
         <section className="flex-1 overflow-y-auto bg-[#091a2a] px-5 py-4">
