@@ -20,9 +20,23 @@ export default function Login(){
 
     }
 
-    if(loading){
-        return (<main><h1 className="flex justify-center items-center min-h-screen text-4xl">Loading......</h1></main>)
-    }
+    if (loading) {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center gap-5 bg-[#050c18] text-white">
+      
+      <div className="h-14 w-14 animate-spin rounded-full border-4 border-slate-700 border-t-pink-500" />
+
+      <div className="text-center">
+        <h1 className="text-xl font-semibold">
+          Loading
+        </h1>
+        <p className="mt-2 text-sm text-slate-400">
+          Please wait...
+        </p>
+      </div>
+    </main>
+  );
+}
 
     return(
         <main className="min-h-screen w-full flex justify-center items-center">
