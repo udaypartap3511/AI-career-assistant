@@ -8,7 +8,7 @@ const app= express()
 app.use(express.json({limit:"16kb"}))
 app.use(cookieParser())
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:process.env.CORS_ORIGIN ,
     credentials:true
 }))
 
